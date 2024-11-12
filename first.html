@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First </title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+    <h1>First</h1>
+    <h2>Send Message</h2>
+
+    <form id="messageForm">
+        <label for="user">User:</label>
+        <input type="text" id="user" name="user" required><br><br>
+
+        <label for="text">Message:</label>
+        <input type="text" id="text" name="text" required><br><br>
+
+        <button type="submit">Send</button>
+    </form>
+
+    <p id="responseMessage"></p>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
+
+        Pusher.logToConsole = true;
+
+        // Init Pusher
+        var pusher = new Pusher('7ce455f7b5b717ba3d8c', {
+            cluster: 'ap2'
+        });
+
+        // Subscribe to the channel and bind to the event
+        var channel = pusher.subscribe('my-channel');
+        channel.bind('my-event-one', function (data) {
+            alert(data.Text);
+            console.log(data.Text);
+        });
+
+
+        document.getElementById('messageForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const user = document.getElementById('user').value;
+            const text = document.getElementById('text').value;
+
+            const messageData = {
+                user: user,
+                text: text
+            };
+
+            // Send POST request to the API endpoint "sendtosecond"
+            axios.post('http://localhost:5076/api/notifications/sendtosecond', messageData)
+                .then(response => {
+                    console.log(response.data.Status);
+                    document.getElementById('responseMessage').innerText = "Success";
+                })
+                .catch(error => {
+                    console.error('There was an error sending the message!', error);
+                    document.getElementById('responseMessage').innerText = 'Error sending message.';
+                });
+        });
+    </script>
+
+</body>
+
+</html>
